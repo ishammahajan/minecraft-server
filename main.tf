@@ -29,7 +29,7 @@ Features
 terraform {
   backend "gcs" {
     prefix = "minecraft/state"
-    bucket = "minecraft-experience"
+    bucket = "minecraft-roommates"
   }
 }
 
@@ -40,9 +40,9 @@ terraform {
 #   terraform apply
 locals {
   # The Google Cloud Project ID that will host and pay for your Minecraft server
-  project = "test-salad-2125"
-  region  = "asia-south1"
-  zone    = "asia-south1-a"
+  project = "algebraic-cycle-399402"
+  region  = "us-east1"
+  zone    = "us-east1-b"
   # Allow members of an external Google group to turn on the server
   # through the Cloud Console mobile app or https://console.cloud.google.com
   # Create a group at https://groups.google.com/forum/#!creategroup
@@ -80,7 +80,7 @@ resource "google_compute_address" "minecraft" {
 # VM to run Minecraft, we use preemptable which will shutdown within 24 hours
 resource "google_compute_instance" "minecraft" {
   name         = "minecraft"
-  machine_type = "n1-standard-1"
+  machine_type = "e2-standard-4"
   zone         = local.zone
   tags         = ["minecraft"]
 
@@ -95,7 +95,7 @@ resource "google_compute_instance" "minecraft" {
   # SCRIPT BACKUP
   # docker run -d -p 25565:25565 -e EULA=TRUE -e VERSION=1.12.2 -v /var/minecraft:/data --name mc -e TYPE=FORGE -e FORGEVERSION=14.23.0.2552 -e MEMORY=2G --rm=true itzg/minecraft-server:latest;
   # SCRIPT BACKUP
-  metadata_startup_script = "docker run -d -p 25565:25565 -e EULA=TRUE -v /var/minecraft:/data --name mc -e TYPE=FORGE -e VERSION=1.16.5 -e FORGEVERSION=36.1.16 -e MEMORY=2G --rm=true itzg/minecraft-server:latest;"
+  metadata_startup_script = "docker run -d -p 25565:25565 -e EULA=TRUE -v /var/minecraft:/data --name mc -e TYPE=FORGE -e VERSION=1.19.2 -e FORGEVERSION=43.2.23 --rm=true itzg/minecraft-server:latest;"
 
   metadata = {
     enable-oslogin = "TRUE"
@@ -122,6 +122,8 @@ resource "google_compute_instance" "minecraft" {
     preemptible       = true # Closes within 24 hours (sometimes sooner)
     automatic_restart = false
   }
+
+  allow_stopping_for_update = true
 }
 
 # Create a private network so the minecraft instance cannot access
